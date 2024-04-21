@@ -41,6 +41,7 @@
 \usetikzlibrary{automata,positioning}
 \usepackage{tabularx}
 \usepackage{booktabs}
+\usepackage[T1]{fontenc}
 
 %%leave copyright info to the editor
 \CopyrightLine[]{}{\textit{This is an open access article under the \textcolor{blue}{\underline{CC BY-SA}} license.}
@@ -127,7 +128,7 @@ First keyword \sep Second keyword \sep Third keyword \sep Fourth keyword \sep Fi
 \begin{abstract}
 \vspace{.3em}
 %% Text of abstract
-This paper explores the use of Mean-End Analysis and heuristic functions to enhance AI in the board game Santorini, focusing on the strategic use of god powers like Apollo and Atlas. Traditional AI models have neglected these powers, limiting their effectiveness. Our research addresses this by developing an AI model that uses heuristic functions to make smarter decisions, significantly improving its strategic play. This not only demonstrates the AI's improved ability to navigate Santorini's complexities but also opens avenues for future work on AI strategy in games with changing dynamics, marking a notable contribution to AI and game strategy studies.
+This paper explores the use of Mean-End Analysis and heuristic functions to enhance AI in the board game Santorini, focusing on the strategic use of god powers like Apollo and Atlas. Traditional AI models have neglected these powers, limiting their effectiveness. Our research addresses this by developing an AI model that uses heuristic functions to make smarter decisions, significantly improving its strategic play. This not only demonstrates the AI's improved ability to navigate Santorini's complexities but also opens avenues for future work on AI strategy in games with changing dynamics.
 \end{abstract}
 }
 \parbox[l]{\textwidth}{%
@@ -151,22 +152,17 @@ Email: 01679220011@student.uph.edu
 
 \section{Introduction}
 \label{}
-The integration of artificial intelligence (AI) in board games has seen remarkable advancements, contributing significantly to the fields of game theory and computational intelligence. Santorini, a strategy board game renowned for its blend of simplicity and strategic depth, presents an interesting case study for AI research. Prior works, including Jack Boreham's exploration into developing an AI capable of playing Santorini, have focused on leveraging traditional AI techniques to navigate the game's complex decision spaces effectively. However, these studies predominantly target the game's basic mechanics, overlooking the nuanced strategic layers introduced by the god system \cite{Boreham2019}.
+Prior research on board games decision-making predominantly focuses on basic gameplay strategies, often overlooking the intricate potential of variable player powers in the case of the Santorini board game, which uses god abilities [1-5]. Santorini’s god system, with powers like those of Apollo and Atlas, presents unique strategic challenges that are yet to be fully leveraged by current AI models. For example, Apollo allows players to swap places with an opponent, introducing dynamic positional strategies, while Atlas can build a dome at any level, which disrupts the normal progression of construction in the game. These abilities introduce complex decision layers that current AI models have not yet fully explored. This oversight is highlighted by Boreham \cite{Boreham2019} and further examined through various AI adaptations for board games that incorporate variable player powers [6-10].
 
-The god system in Santorini introduces unique powers and abilities, significantly diversifying gameplay and strategic considerations. This aspect of Santorini has been underexplored in AI research, representing a gap in our understanding of AI's potential to adapt to and leverage variable player powers in board games. Boreham's project, while providing a solid foundation in AI development for Santorini, does not delve into the complexities introduced by the god system, focusing instead on a basic version of the game \cite{Boreham2019}.This gap highlights a broader trend in AI board game research, where the variability and strategic depth added by such systems are often overlooked.
-
-This research aims to fill this gap by focusing on the integration of Mean End Analysis and heuristic functions to address the unique challenges posed by the god system in Santorini. By doing so, it seeks not only to enhance AI performance in a more complex version of Santorini but also to contribute to the broader discourse on AI adaptability in board games featuring variable player powers. Through a critical analysis of existing AI strategies, as illustrated by Boreham's work, and the development of novel MCTS adaptations, this research aims to illuminate AI potential in navigating variable player powers introduced by Santorini's god system \cite{Boreham2019}.
-
-
+This study builds upon these foundational insights, employing a Mean-End Analysis approach integrated with heuristic functions adjusted to the challenges posed by the god system in Santorini. This research aims not only to enhance AI's strategic performance in complex game setups but also contributes broadly to the discourse on AI adaptability and game theory [11-15]. Moreover, the application of AI in board games like Santorini supports broader implications for computational intelligence, offering insights into decision-making processes that are applicable in more complex real-world scenarios [16-22]. This paper thus not only investigates a specific case study but also enriches the understanding of AI's potential in diverse applications.
 
 \section{Method}
 \label{}
-Explaining research chronological, including research design, research procedure (in the form of algorithms, Pseudocode or other), how to test and data acquisition [5]–[7]. The description of the course of research should be supported references, so the explanation can be accepted scientifically [2], [4]. Figures 1-2 and Table 1 are presented center, as shown below and cited in the manuscript [5], [8]–[13]. The nodes energy consumption in network OHCRP (50\%\ DSr) vs SPEED has been illustrated in Figure 2(a) and network OHCRP (50% DSr) vs THVR has been illustrated Figure 2(b).
 \subsection{Game State Design}
-A game state refers to a digital snapshot of all relevant information in a game at any given moment, encompassing the position of pieces, the current player's turn, and any other pertinent data that defines the game's status \cite{Jarvinen2008}. The game state is a structured representation that breaks down the game into manageable components, each reflecting an a aspect of gameplay, the game state is segmented into six elements:
+A game state refers to a digital snapshot of all relevant information in a game at any given moment, encompassing the position of pieces, the current player's turn, and any other data that defines the game's status \cite{Jarvinen2007}. The game state is a structured representation that breaks down the game into manageable components, each reflecting an a aspect of gameplay, the game state is segmented into six elements:
 \begin{enumerate}
     \item \textbf{Current Player's Turn:} Identifies which player's turn it is to act, represented by a single value string, such as "p1" or "p2", indicating the active player.
-    \item \textbf{State Action:} Current action phase of state within a player's turn: "pick god", "place worker", "move", "build", along with outcomes like "win", "lose", and "draw".
+    \item \textbf{State Action:} Current action phase of state within a player's turn: "pick god", "place worker", "move", "build", along with outcomes like "win", and "lose".
     \item \textbf{Active Worker:} Which worker is currently engaged for the player, denoted by identifiers such as "w1" or "w2". This specification is crucial for building, which necessitate knowledge of the worker's id after moving.
     \item \textbf{Players and Their Gods:} Lists the players along with the gods they have chosen, such as \texttt{[['p1', 'Atlas'], ['p2', 'Apollo']]}.
     \item \textbf{Building Board:} This component represents the levels of construction on the board, with numbers from 0 to 4, where '0' indicates an empty tile, '1' to '3' represent the height of buildings, and '4' denotes a dome. This model simplifies the representation by standardly using '4' for domes, although, in practice, the god power of Atlas allows for the placement of domes at any level.
@@ -248,11 +244,10 @@ Finally, 'Build' actions alter the board layout on the fifth element.
 The four actions: pick god, place worker, move, and build is then categorized as operators, 
 each with specific preconditions and results. 
 
-From the sample game state and flow state diagram provided, a mathematical model for Santorini board game is constructed.With limitation of focusing solely on the gods Apollo and Atlas in the mathematical model provides a concise framework to illustrate how heuristic values can influence the use of god powers effectively within AI strategies. This constraint, while reducing the game's complexity, offers a clear perspective on how specific god powers can be leveraged and optimized through heuristic evaluation, 
-demonstrating the impact of these powers on strategic decision-making in a controlled setting.
+From the sample game state and flow state diagram provided, a mathematical model for Santorini board game is constructed.With limitation of focusing solely on the gods Apollo and Atlas, this mathematical model provides a concise framework to illustrate how heuristic values can influence the use of god powers effectively within AI strategies. This constraint, while reducing the game's complexity, offers a clear perspective on how specific god powers can be leveraged and optimized through heuristic evaluation, demonstrating the impact of these powers on strategic decision-making in a controlled setting.
 
 \subsection{Game State and Game Engine Mathematical Model}
-First, define the number of players, \(n\), such that \(2 \leq n \leq 4\). Then, construct the player and worker set \( \text{Players} = \{p_1, p_2, \ldots, p_n\} \),\(\text{Workers} = \{p_{1}w_{1},p_{1}w_{2},p_{2}w_{1},p_{2}w_{2}, \ldots, p_{n}w_{1},p_{n}w_{2}\}\) Define the set of gods as \(\text{Gods} = \{\text{"Atlas"}, \text{"Apollo"}\}\).Then the turn action set which defines what action is available \(\text{TurnAction} = \{\text{"pick god"}, \text{"place worker"}, \text{"move"}, \text{"build"}\}\).From that we can construct state tuple as \(S_t = (\text{CPlayer}, \text{Phase}, \text{AWrk}, \text{PGods}, \text{Building}, \text{Worker})\).With each element criteria as \(\text{CPlayer} \in \text{Players}\),\(\text{Phase} \in \text{TurnAction}\),\(\text{ActiveWorker} \in \text{Workers} \text{ if and only if } \text{Phase} = \text{"build"}\), \(PGods\) as seen in Equation~\ref{eq:playergods},\(Building\) as seen in Equation~\ref{eq:board_build}, and \(Worker\) as seen in Equation~\ref{eq:board_worker}.
+First, define the number of players \(n\), such that \(2 \leq n \leq 4\). Then, construct the player and worker set \( \text{Players} = \{p_1, p_2, \ldots, p_n\} \),\(\text{Workers} = \{p_{1}w_{1},p_{1}w_{2},p_{2}w_{1},p_{2}w_{2}, \ldots, p_{n}w_{1},p_{n}w_{2}\}\) Define the set of gods as \(\text{Gods} = \{\text{"Atlas"}, \text{"Apollo"}\}\).Then the turn action set which defines what action is available \(\text{TurnAction} = \{\text{"pick god"}, \text{"place worker"}, \text{"move"}, \text{"build"}\}\).From that we can construct state tuple as \(S_t = (\text{CPlayer}, \text{Phase}, \text{AWrk}, \text{PGods}, \text{Building}, \text{Worker})\).With each element criteria as \(\text{CPlayer} \in \text{Players}\),\(\text{Phase} \in \text{TurnAction}\),\(\text{ActiveWorker} \in \text{Workers} \text{ if and only if } \text{Phase} = \text{"build"}\), \(PGods\) as seen in Equation~\ref{eq:playergods},\(Building\) as seen in Equation~\ref{eq:board_build}, and \(Worker\) as seen in Equation~\ref{eq:board_worker}.
 
 \begin{equation}
     \begin{aligned}
@@ -294,7 +289,7 @@ First, define the number of players, \(n\), such that \(2 \leq n \leq 4\). Then,
     \label{eq:board_worker} 
 \end{equation}
 
-From these criteria, we can construct an operator table as shown in Table~\ref{tab:operators} that facilitates interaction with the game state through specific operators.
+From these criteria, we can construct an operator table as shown in Table~\ref{tab:operators} that facilitates interaction with the game state through specific operators \cite{krisnadi2016}.
 Each operator is associated with a set of predefined conditions and, when applied, transitions the game into a new state, enabling continued gameplay.
 
 \begin{table}[h]
@@ -326,7 +321,7 @@ OP(5): Build \newline buildWorker$(S_t, p_xw_y, i, j, d)$ &
 $S_t[1] = \text{'build'}$ \newline $1 \leq x \leq n$ \newline $1 \leq y \leq 2$ \newline $\forall a \in \{i, j\}, 0 \leq a \leq 4$ \newline
 Equation~\ref{eq:chk_worker_pos}\newline 
 $\neg (\text{{god}}_{S_t[0]} \neq \text{'Atlas'} \land d = \text{True})$\newline
-Equation~\ref{eq:chk_worker_pos} & 
+Equation~\ref{eq:chk_worker_build} & 
 $S_{t+1} \gets \text{Equation~\ref{eq:worker_build}}(S_t, p_xw_y, i, j, d)$ \\ \hline
 \end{tabularx}
 \end{table}
@@ -345,7 +340,7 @@ The operator \( \text{OP}(1): \text{GenerateStartingState} \) as shown by Table~
     \label{eq:start_state}
 \end{equation}
 
-Following the initial state setup, the operator \( \text{OP}(2): \text{PickGod} \) advances the game into its next state as specified by Equation~\ref{eq:pick_god}. This equation assigns a specific god to a player based on the input god. Once all gods have been selected, indicating each \( \text{god}_i \neq \emptyset \) for \( i \) ranging from 1 to \( n \), the game action phase transitions to 'place worker', indicating a shift in gameplay dynamics. Concurrently, Equation~\ref{eq:next_player} is invoked to advance the turn to the next player. Specifically, if the current player \( S_t[0] \) is equal to \( S_t[3]_{pi} \), and \( i = n \), indicating the last player, then \( S_t[0] \) is reset to \( p_1 \), the first player, to maintain the turn cycle. Otherwise, the turn shifts to \( p_{i+1} \), the next sequential player. This mechanism ensures a smooth transition of turns among players following the god selection phase, systematically moving the game forward by updating player turns and transitioning into new phases of gameplay.
+Following the initial state setup, the operator \( \text{OP}(2): \text{PickGod} \) advances the game into its next state as specified by Equation~\ref{eq:pick_god}. This equation assigns a specific god to a player based on the input god. Once all gods have been selected, indicating each \( \text{god}_i \neq \emptyset \) for \( i \) ranging from 1 to \( n \), the game action phase transitions to 'place worker', Concurrently, Equation~\ref{eq:next_player} is invoked to advance the turn to the next player. Specifically, if the current player \( S_t[0] \) is equal to \( S_t[3]_{pi} \), and \( i = n \), indicating the last player, then \( S_t[0] \) is reset to \( p_1 \), the first player, to maintain the turn cycle. Otherwise, the turn shifts to \( p_{i+1} \), the next sequential player. This mechanism ensures a smooth transition of turns among players following the god selection phase, systematically moving the game forward by updating player turns and transitioning into new phases of gameplay.
 
 \begin{equation}
 \label{eq:next_player}
@@ -400,7 +395,7 @@ Once the conditions for the ``PlaceWorker'' operation are fulfilled, the game pr
 \label{eq:chk_worker_appolo}
 \end{equation}
 
-The ``Move'' operator, \( \text{OP}(4):\text{Move} \), detailed as \( \text{moveWorker}(S_t, p_xw_y, i, j) \), outlines the requirements for moving a worker on the game board. This operation is permissible only when the game is in the 'move' phase, as indicated by \( S_t[1] = \text{'move'} \). The conditions specify that \( x \), denoting the player number, must be within the range of 1 to \( n \), where \( n \) is the total number of players, and \( y \), representing one of the two workers for each player, must be either 1 or 2. Furthermore, the destination coordinates \( (i, j) \) must lie within the 5x5 grid, hence \( \forall a \in \{i, j\}, 0 \leq a \leq 4 \). Equation ~\ref{eq:chk_worker_pos} sets the precondition that the intended move should not place a worker on a cell that is already occupied by the same worker, ensuring movement occurs. The specifics of the move depend on the current player's god ability. If the player's god is 'Apollo', Equation  ~\ref{eq:chk_worker_appolo} is applied; otherwise, Equation  ~\ref{eq:chk_worker_move} governs the move. The distinction between the conditions set forth in Equations  ~\ref{eq:chk_worker_move} and ~\ref{eq:chk_worker_appolo} for the "Move" operator revolves around the handling of occupied tiles. While both conditions prohibit moving to a tile occupied by a level 4 block that is a dome \(( S_t[4][i][j] \neq 4 )\), ensuring the move is within one space \( (\left| w_i - i \right| \leq 1 \land \left| w_j - j \right| \leq 1 ) \), and adhering to movement to a space of equal or one level higher than the worker's current position, the crucial difference lies in their approach to occupied tiles. Specifically, Equation ~\ref{eq:chk_worker_move} requires the destination tile \( S_t[5][i][j] \) to be unoccupied \( (\emptyset) \), catering to standard movement rules. Conversely, Equation ~\ref{eq:chk_worker_appolo}, applicable when the player's god is 'Apollo', allows for the swapping of positions with another player's worker, provided the destination tile does not contain one of the moving player's own workers \( (S_t[5][i][j] \notin \{p_xw_1, p_xw_2\}) \). This nuanced approach introduces a strategic layer for players with the 'Apollo' god power, allowing them to interact with other players' workers on the board, thus enriching the tactical depth and complexity of the movement phase while upholding the integrity and competitive balance of the gameplay.
+The ``Move'' operator, \( \text{OP}(4):\text{Move} \), detailed as \( \text{moveWorker}(S_t, p_xw_y, i, j) \), outlines the requirements for moving a worker on the game board. This operation is permissible only when the game is in the 'move' phase, as indicated by \( S_t[1] = \text{'move'} \). The conditions specify that \( x \), denoting the player number, must be within the range of 1 to \( n \), where \( n \) is the total number of players, and \( y \), representing one of the two workers for each player, must be either 1 or 2. Furthermore, the destination coordinates \( (i, j) \) must lie within the 5x5 grid, hence \( \forall a \in \{i, j\}, 0 \leq a \leq 4 \). Equation ~\ref{eq:chk_worker_pos} sets the precondition that the intended move should not place a worker on a cell that is already occupied by the same worker, ensuring movement occurs. The specifics of the move depend on the current player's god ability. If the player's god is 'Apollo', Equation  ~\ref{eq:chk_worker_appolo} is applied; otherwise, Equation  ~\ref{eq:chk_worker_move} is applied. The distinction between the conditions set forth in Equations  ~\ref{eq:chk_worker_move} and ~\ref{eq:chk_worker_appolo} for the "Move" operator revolves around the handling of occupied tiles. While both conditions prohibit moving to a tile occupied by a level 4 block that is a dome \(( S_t[4][i][j] \neq 4 )\), ensuring the move is within one space \( (\left| w_i - i \right| \leq 1 \land \left| w_j - j \right| \leq 1 ) \), and adhering to movement to a space of equal or one level higher than the worker's current position, the crucial difference lies in their approach to occupied tiles. Specifically, Equation ~\ref{eq:chk_worker_move} requires the destination tile \( S_t[5][i][j] \) to be unoccupied \( (\emptyset) \), catering to standard movement rules. Conversely, Equation ~\ref{eq:chk_worker_appolo}, applicable when the player's god is 'Apollo', allows for the swapping of positions with another player's worker, provided the destination tile does not contain one of the moving player's own workers \( (S_t[5][i][j] \notin \{p_xw_1, p_xw_2\}) \).
 
 \begin{equation}
  \begin{aligned}
@@ -416,7 +411,7 @@ The ``Move'' operator, \( \text{OP}(4):\text{Move} \), detailed as \( \text{move
 
 Once the preconditions for the ``Move'' operation are satisfied, Equation Equation ~\ref{eq:worker_move} is invoked to generate the next state of the worker's move to the new position, transitioning the game state to \( S_{t+1} \). This equation plays a crucial role in updating the board's configuration: if a worker identified as \( p_xw_y \) occupies a tile \( (w_i, w_j) \), the operation swaps the worker's current position with the targeted position \( (i, j) \). Specifically, \( w_t \), which temporarily holds the worker's identifier, facilitates the exchange by first capturing the worker at \( (w_i, w_j) \), then updating the tile \( (w_i, w_j) \) with the content of the destination tile \( (i, j) \), and finally setting the destination tile with \( w_t \) value. The distinction between Apollo's ability and that of other gods becomes irrelevant in this context, as the mechanics of swapping are consistent: Apollo's power allows for swapping with another player's worker, whereas, for other gods, the swap is essentially with an empty tile. Therefore, the procedural outcome remains the same, facilitating the worker's relocation on the board.
 
-Furthermore, if the destination tile \( (i, j) \) has a building height of 3 \( (S_t[4][i][j] = 3) \), it triggers a win condition, updating \( S_t[1] \) to 'win'. Otherwise, the game progresses to the 'build' phase, and Equation ~\ref{eq:next_player} is called to advance the turn to the next player. This sequential process not only orchestrates the worker's movement but also integrates the possibility of achieving a win condition based on the movement's outcome, thereby seamlessly transitioning into the subsequent game phase or concluding the game with a victory.
+Furthermore, if the destination tile \( (i, j) \) has a building height of 3 \( (S_t[4][i][j] = 3) \), it triggers a win condition, updating \( S_t[1] \) to 'win'. Otherwise, the game progresses to the 'build' phase, and Equation ~\ref{eq:next_player} is called to advance the turn to the next player. This sequential process not only demonstrate the worker's movement but also integrates the possibility of achieving a win condition based on the movement's outcome, thereby seamlessly transitioning into the subsequent game phase or concluding the game with a victory.
 
     
 \begin{equation}
@@ -441,7 +436,7 @@ The ``Build'' operator, denoted as \( \text{OP}(5):\text{Build} \) which is done
 
 Upon meeting the set preconditions, the ``Build'' operation progresses to invoke Equation ~\ref{eq:worker_build}, which is articulated as \( S_{t+1} \gets \text{Equation ~\ref{eq:worker_build}}(S_t, p_xw_y, i, j, d) \). This equation finely tunes the building mechanics, especially taking into account the god power of Atlas. When the condition \( \neg (\text{god}_{S_t[0]} \neq \text{'Atlas'} \land d = \text{True})\) is fulfilled, the building action diverges based on the boolean value of \( d \). If \( d \) equals True, indicating the intention to use Atlas's power to place a dome, the building height at the targeted coordinates \((i, j)\) is directly set to 4, symbolizing the placement of a dome irrespective of the current building level. Conversely, if \( d \) is False, reflecting a standard building action, the building height at \((i, j)\) is incremented by one, following normal game rules for construction. Subsequently, the game phase is updated to 'move', and Equation ~\ref{eq:next_player} is called to transition the turn to the next player. This sequence ensures that after a building action is completed, whether it involves escalating a building's height or placing a dome by invoking the special ability of Atlas, the game fluidly moves forward, shifting the active phase back to player movement. 
 
-The defined operators and their preconditions are essential for the game engine's operation, orchestrating the sequence of gameplay phases and ensuring adherence to the game's strategic and rule-based structure. With this foundation in place, the next critical step is to develop a heuristic function. This function will assess potential moves by assigning values to game states, guiding players in identifying the most advantageous actions. This progression from establishing game mechanics to integrating a decision-making framework is pivotal in enhancing the game's strategic depth and optimizing gameplay outcomes.
+The defined operators and their preconditions are essential for the game engine's operation, demonstrating the sequence of gameplay phases and ensuring adherence to the game's strategic and rule-based structure. With this foundation in place, the next critical step is to develop a heuristic function. This function will assess potential moves by assigning values to game states, guiding players in identifying the most advantageous actions. This progression from establishing game mechanics to integrating a decision-making framework is pivotal in enhancing the game's strategic depth and optimizing gameplay outcomes.
 
 \subsection{Heuristic Function}
 
@@ -484,7 +479,7 @@ This research defines heuristic values from 0 to 100 for AI decision-making in t
 \label{eq:move_appolo_heur}
 \end{equation}
 
-The move heuristic function as shown in Equation ~\ref{eq:move_max_heur} aims to calculate the optimal move by calculating the maximum heuristic value among all valid moves for a game state \( S \), considering all possible positions \( i, j \) on the 5x5 board and each player's two workers \( y \). Validity is determined by whether a move action \( \text{moveWorker}(S_t, S_t[0]w_y, i, j) \) is possible. If a move is valid, its value is assessed based on whether the player's god is 'Apollo' and the specific conditions met at the target location. For non-'Apollo' moves, the heuristic values are assigned as follows as shown in Equation ~\ref{eq:move_norm_heur}: moving to a level 3 tile scores 100, indicating a win; a level 2 tile scores 5; a level 1 tile scores 2; and a ground-level tile scores 1. This tiered system prioritizes moves that lead closer to victory or offer strategic positioning. For 'Apollo' moves, the heuristic values are enhanced if the target tile is not occupied by the player's workers or is empty as shown in Equation ~\ref{eq:move_appolo_heur}: 100 for level 3 (winning move), 10 for level 2, 5 for level 1, and 1 for ground level. This increase reflects 'Apollo's ability to swap places with an opponent's worker, providing strategic advantages like swapping with opponent positioning for a win. If a move does not meet the 'Apollo' criteria, it defaults to the standard move valuation. This heuristic function Equation ~\ref{eq:move_max_heur} 
+The move heuristic function as shown in Equation ~\ref{eq:move_max_heur} aims to calculate the optimal move by calculating the maximum heuristic value among all valid moves for a game state \( S \), considering all possible positions \( i, j \) on the 5x5 board and each player's two workers \( y \). Validity is determined by whether a move action \( \text{moveWorker}(S_t, S_t[0]w_y, i, j) \) is possible. If a move is valid, its value is assessed based on whether the player's god is 'Apollo' and the specific conditions met at the target location. For non-'Apollo' moves, the heuristic values are assigned as follows as shown in Equation ~\ref{eq:move_norm_heur}: moving to a level 3 tile scores 100, indicating a win; a level 2 tile scores 5; a level 1 tile scores 2; and a ground-level tile scores 1. This tiered system prioritizes moves that lead closer to victory or offer strategic positioning. For 'Apollo' moves, the heuristic values are enhanced if the target tile is not occupied by the player's workers or is empty as shown in Equation ~\ref{eq:move_appolo_heur}: 100 for level 3 (winning move), 10 for level 2, 5 for level 1, and 1 for ground level. This increase reflects 'Apollo's ability to swap places with an opponent's worker, providing strategic advantages like swapping with opponent positioning for a win. If a move does not meet the 'Apollo' criteria, it defaults to the standard move valuation.
 
 \subsubsection {Build Heuristic Function}
 \begin{equation}
@@ -519,7 +514,7 @@ The move heuristic function as shown in Equation ~\ref{eq:move_max_heur} aims to
 
 The build heuristic function, outlined in Equation ~\ref{eq:build_max_heur}, is designed to optimize the building strategy by evaluating the potential impact of each valid build move within the game. It aims to maximize the heuristic value by considering all possible placements $(i,j)$ on the board, each of the player's two workers $y$, and the decision to either place a block or a dome $d$. The function first verifies the legality of a build action with $\text{buildWorker}(S_t, p_{xw_y}, i, j, d) = \text{True}$. When the player's god is 'Atlas', the heuristic function $\mathbf{f}_{\mathbf{atlas}}(\mathbf{S}, \mathbf{i}, \mathbf{j}, \mathbf{d})$ as shown by Equation ~\ref{eq:build_atlas_heur} adds additional value to moves that utilize Atlas's unique ability to place a dome at any level, signifying strategic plays that could block an opponent's victory path.
 
-The general build function $\mathbf{f}_{\mathbf{build}}(\mathbf{S}, \mathbf{i}, \mathbf{j})$ as showb by Equation ~\ref{eq:build_norm_heur} assigns values based on the game's current state, particularly focusing on positions that could either advance the player's position or prevent an opponent from winning. For example, building on tiles adjacent to an opponent's level 2 worker assigns a higher value, aiming to block their progression to a win. The heuristic also adds value for building around a level 3 tile if it prevents an opponent's win, reflecting defensive strategies. Furthermore, $\mathbf{f}_{\mathbf{build}}$ incorporates a nuanced evaluation of the board, adding scores for building blocks that align with the game's immediate strategic needs, higher values for blocking an opponent, and moderate values for advancing one's own position. The addition of $\mathbf{f}_{\mathbf{atlas}}$ reflects a similar strategic depth but with a specific focus on utilizing Atlas's power for dome placement in critical areas, enhancing both offensive and defensive capabilities.
+The general build function $\mathbf{f}_{\mathbf{build}}(\mathbf{S}, \mathbf{i}, \mathbf{j})$ as shown by Equation ~\ref{eq:build_norm_heur} assigns values based on the game's current state, particularly focusing on positions that could either advance the player's position or prevent an opponent from winning. For example, building on tiles adjacent to an opponent's level 2 worker assigns a higher value, aiming to block their progression to a win. The heuristic also adds value for building around a level 3 tile if it prevents an opponent's win, reflecting defensive strategies. Furthermore, $\mathbf{f}_{\mathbf{build}}$ incorporates a nuanced evaluation of the board, adding scores for building blocks that align with the game's immediate strategic needs, higher values for blocking an opponent, and moderate values for advancing one's own position. The addition of $\mathbf{f}_{\mathbf{atlas}}$ reflects a similar strategic depth but with a specific focus on utilizing Atlas's power for dome placement in critical areas, enhancing both offensive and defensive capabilities.
 
 
 \subsection{Simulations}
@@ -604,16 +599,79 @@ The heuristic function analyzed in this research proved effective against random
 
 %%The main references are international journals and proceedings. All references should be to the most pertinent, up-to-date sources and the minimum of references are 25. References are written in IEEE style. Please use a consistent format for references – see examples below:
 
-%% \bibitem must have the following form:
-%%   \bibitem{key}...
-%%
-
 \bibitem{Boreham2019}
 J. E. Boreham, "Developing an Artificial Intelligence capable of playing the board game Santorini," 2019.
-\bibitem{Jarvinen2008}
-A. Järvinen, ``Games without frontiers: Theories and Methods for Game Studies and Design,'' [Online]. Available: \url{https://www.researchgate.net/publication/273947205}
+
+\bibitem{krisnadi2016}
+D. Krisnadi and S. Lukas, "Saboteur Game Modelling Using Means-Ends Analysis," 2016.
+
+\bibitem{FortGanZhao2022}
+S. Fort, L. Gan, and A. Zhao, "Applying Machine Learning to the Board Game Pylos," cs229.stanford.edu, 2022.
+
+\bibitem{Jardim2020}
+J. Jardim, R. Bettker, P. Minini, G. Pereira, et al., "An implementation of the 7 wonders board game for ai-based players," presented at the Conference on Computer Games, sbgames.org, 2020.
+
+\bibitem{Justesen2018}
+N. Justesen, S. Risi, and J. Togelius, "Blood Bowl: The Next Board Game Challenge for AI," pure.itu.dk, 2018.
+
+\bibitem{Gaina2021}
+R. D. Gaina, J. Goodman, and D. Perez-Liebana, "Terraforming Mars," in \textit{Proceedings of the Seventeenth AAAI Conference on Artificial Intelligence and Interactive Digital Entertainment (AIIDE 2021)}, Queen Mary University of London, UK, 2021.
+
+\bibitem{Sfikas2020}
+K. Sfikas and A. Liapis, "Collaborative Agent Gameplay in the Pandemic Board Game," in \textit{International Conference on the Foundations of Digital Games (FDG '20)}, September 15–18, 2020, Bugibba, Malta. ACM, New York, NY, USA, 11 pages. https://doi.org/10.1145/3402942.3402943
+
+\bibitem{Perez2021}
+L. Perez, "Mastering Terra Mystica: Applying Self-Play to Multi-agent Cooperative Board Games," Stanford University, February 2021. Available: https://github.com/kandluis/terrazero
+
+\bibitem{Wynter2021}
+A. Wynter, "Turing Completeness and Sid Meier's Civilization," 2021.
+
+\bibitem{Churchill2019}
+A. Churchill, S. Biderman, and A. Herrick, "Magic: The Gathering is Turing Complete," arXiv:1904.09828 [cs.AI], April 2019.
+
+\bibitem{Iordan2021}
+A.E. Iordan, "Analytical Study of the A* Heuristic Search Algorithm Used to Solve Efficiently a Puzzle Game," in \textit{Advanced Aspects of Engineering Research Vol. 9}, researchgate.net, 2021.
+
+\bibitem{Jantvongso2020}
+S. Jantvongso and C. Nuansomsri, "Heuristic Evaluation of ‘PaPaYa PokPok’: Case Study of a Mobile Game," in \textit{KKU Research Journal (Graduate Studies)}, vol. 20, no. 2, pp. April-June 2020, researchgate.net.
+
+\bibitem{Ksiazek2018}
+K. Książek, D. Połap, and M. Woźniak, "Benchmark tests on heuristic methods in the darts game," \textit{International Journal of Electronics and Telecommunications}, journals.pan.pl, 2018.
+
+\bibitem{Santos2018}
+B. S. Santos and H. S. Bernardino, "Game State Evaluation Heuristics in General Video Game Playing," in \textit{Proc. 2018 17th Brazilian Symposium on Computer Games and Digital Entertainment (SBGames)}, 2018, pp. 147-14709, doi: 10.1109/SBGAMES.2018.00026.
+
+\bibitem{Churchill2021}
+D. Churchill, A. Saffidine, and M. Buro, "Fast Heuristic Search for RTS Game Combat Scenarios," in \textit{AIIDE}, vol. 8, no. 1, pp. 112-117, Jun. 2021.
+
+\bibitem{Vahidnia2019}
+M. H. Vahidnia, A. Vafaeinejad, and M. Shafiei, "Heuristic Game-Theoretic Equilibrium Establishment with Application to Task Distribution among Agents in Spatial Networks," \textit{Journal of Spatial Science}, vol. 64, no. 1, pp. 131-152, 2019. doi:10.1080/14498596.2017.1395773.
+
+\bibitem{Ozdowska2023}
+A. Ozdowska, P. Sweetser, and M. Daiiani, "A Scoping Review of Heuristics in Videos Games Research: Definitions, Development, Application, and Operationalisation," \textit{Proc. ACM Hum.-Comput. Interact.}, vol. 7, no. CHI PLAY, Article 389, pp. 1-23, Oct. 2023. [Online]. Available: https://doi.org/10.1145/3611035
+
+\bibitem{Ishaq2021}
+K. Ishaq, F. Rosdi, N. A. M. Zin, and A. Abid, "Heuristic and Think Aloud Method to Evaluate the Low Fidelity Prototype of Game-Based Language Learning Application," in \textit{Proc. 2021 International Conference on Innovative Computing (ICIC)}, 2021, pp. 1-10, doi: 10.1109/ICIC53490.2021.9693022.
+
+\bibitem{Tommy2017}
+C. A. Tommy, J. L. Minoi, and C. S. Sian, "Game usability heuristics evaluation approach for speech therapy mobile application games," \textit{Journal of Telecommunication, Electronic and Computer Engineering}, 2017. Available: jtec.utem.edu.my/jtec/article/view/3190
+
+\bibitem{Ngo2021}
+P. Ngo, "Game Application Using A* Pathfinding Algorithm to Help Improving Dementia," Graduate Project, Dept. of Computer Science, California State Polytechnic University, Pomona, 2021. Available: https://scholarworks.calstate.edu/concern/theses/70795d43b
+
+\bibitem{Ouassam2021}
+E. Ouassam, N. Hmina, B. Bouikhalene, and H. Hachimi, "Heuristic Methods: Application to Complex Systems," in \textit{Proc. 2021 7th International Conference on Optimization and Applications (ICOA)}, 2021, pp. 1-8, doi: 10.1109/ICOA51614.2021.9442647.
+
+\bibitem{Tian2018}
+Y. Tian, S. Min, and Q. Wu, "Application of Neural Network to Game Algorithm," \textit{Journal of Computer and Communications}, vol. 6, pp. 1-12, 2018. doi: 10.4236/jcc.2018.62001.
+
+
+\bibitem{Jarvinen2007}
+A. Järvinen, "Games without Frontiers: Theories and Methods for Game Studies and Design," PhD dissertation, 2007.
+
 \bibitem{Wang2018}
-Z. Wang, G. Wu, and M. J. Barth, ``Agent-Based Modeling and Simulation of Connected and Automated Vehicles Using Game Engine: A Cooperative On-Ramp Merging Study,'' [Online]. Available: \url{https://www.researchgate.net/publication/328474944}
+Z. Wang, B. Kim, H. Kobayashi, G. Wu, and M. Barth, "Agent-Based Modeling and Simulation of Connected and Automated Vehicles Using Game Engine: A Cooperative On-Ramp Merging Study," 2018.
+
 \bibitem{Cerny2020}
 Černý, J., Bošanský, B., and An, B. (2020). ``Finite State Machines Play Extensive-Form Games.'' In Proceedings of the 21st ACM Conference on Economics and Computation, pages 509--524. ACM.
 
@@ -623,37 +681,24 @@ Z. Wang, G. Wu, and M. J. Barth, ``Agent-Based Modeling and Simulation of Connec
 \newpage
 
 \section*{BIOGRAPHIES OF AUTHORS} 
-\small
-\textbf{\\The recommended number of authors is at least 2. One of them as a corresponding author.}
-\textit{\\Please attach clear photo (3x4 cm) and vita. Example of biographies of authors (9 pt)}:
-\small
+
 
 %% make sure to add \vspace{-.7em} before \begin{biography}
 \vspace{.7em} 
 \small
 \begin{biography}[{\includegraphics[width=2.5cm,height=4cm,clip,keepaspectratio]{a1}}]
-\textbf{Saad Mekhilef} %% Affiliation and educational background.
-\href{https://orcid.org/0000-0001-8544-8995}{\includegraphics[width=0.02\textwidth]{orcid.png}} 
-\href{https://scholar.google.co.id/citations?user=0kKMcLYAAAAJ&hl=en}{\includegraphics[width=0.02\textwidth]{gscholar.png}}
-\href{https://www.scopus.com/authid/detail.uri?authorId=6603317449}{\includegraphics[width=0.02\textwidth]{scopus.png}}
-\href{https://publons.com/researcher/1354246/mekhilef-saad/}{\includegraphics[width=0.02\textwidth]{publons.png}} received the B.Eng. degree in electrical engineering from the University of Setif, Setif, Algeria, in 1995, and the master’s degree in engineering science and the Ph.D. degree in electrical engineering from the University of Malaya, Kuala Lumpur, Malaysia, in 1998 and 2003, respectively. He is currently a Professor and the Director of the Power Electronics and Renewable Energy Research Laboratory, Department of Electrical Engineering, University of Malaya, where he is also the Dean of the Faculty of Engineering. He is also a Distinguished Adjunct Professor with the School of Software and Electrical Engineering, Faculty of Science, Engineering and Technology, Swinburne University of Technology, VIC, Australia. His current research interests include power converter topologies, the control of power converters, renewable energy, and energy efficiency. He can be contacted at email: saad@um.edu.my.
+\textbf{Kelvin} %% Affiliation and educational background.
+received his bachelor’s degree in Informatics from Universitas Atma Jaya Yogyakarta, 2022. He wrote 1 paper with subject related to decision making in board games. His research interested in is Artificial Intelligence with research area in Computational Science. He can be contacted in 082288565655 or klvsrs@gmail.com.
+
 \end{biography}
 
-\begin{biography}[{\includegraphics[width=2.5cm,height=4cm,clip,keepaspectratio]{a2}}]
-\textbf{Oscar Castillo} %% Affiliation and educational background.
-\href{https://orcid.org/0000-0002-7385-5689}{\includegraphics[width=0.02\textwidth]{orcid.png}} 
-\href{https://scholar.google.com/citations?user=1C8gb8IAAAAJ&hl=en}{\includegraphics[width=0.02\textwidth]{gscholar.png}}
-\href{https://www.scopus.com/authid/detail.uri?authorId=7007101709}{\includegraphics[width=0.02\textwidth]{scopus.png}}
-\href{https://publons.com/researcher/1331983/oscar-castillo/}{\includegraphics[width=0.02\textwidth]{publons.png}} received the D.Sc. degree (Doctor Habilitatus) in computer science from the Polish Academy of Sciences, Warsaw, Poland, with the Dissertation “Soft Computing and Fractal Theory for Intelligent Manufacturing”. He is a Professor of computer science in the Graduate Division, Tijuana Institute of Technology, Tijuana, Mexico. In addition, he is serving as Research Director of computer science and Head of the research group on fuzzy logic and genetic algorithms. He is currently the Vice-President of Hispanic American Fuzzy Systems Association (HAFSA) and President Elect of International Fuzzy Systems Association (IFSA). He has published over 80 journal papers, 6 authored books, 20 edited books, and 200 papers in conference proceedings. His research interests are in Type-2 Fuzzy Logic, Fuzzy Control, Neuro-Fuzzy and Genetic-Fuzzy hybrid approaches. He can be contacted at email: ocastillo@tectijuana.mx.
+\begin{biography}[{\includegraphics[width=2.5cm,height=4cm,clip,keepaspectratio]{samuel_lukas}}]
+\textbf{Samuel Lukas} %% Affiliation and educational background.
+\href{https://orcid.org/0000-0003-4102-1628}{\includegraphics[width=0.02\textwidth]{orcid.png}} 
+\href{https://scholar.google.co.id/citations?user=Emm9u1sAAAAJ&hl=id}{\includegraphics[width=0.02\textwidth]{gscholar.png}}
+received his bachelor’s degree in Electrical Engineering from Trisakti University, Jakarta, Indonesia, 1985. His master’s degree in Computer Science was obtained from University of Tasmania, Tasmania, Australia, 1992. His doctorate degree in Science Education, 2005 from Curtin University, Curtin, Australia. He is an associate professor in Computer Science Faculty and Faculty of Education at Universitas Pelita Harapan, Karawaci, Indonesia. He wrote many papers and two chapters of computer subject book. The latest book chapter was titled “Real-world Application of Genetic Algorithms” appears as chapter 15. His research interested in is Artificial Intelligence with research area in Computer Vision and Education Technology. He can be contacted in 08176356565 or samuel.lukas@uph.edu
 \end{biography}
 
-\begin{biography}[{\includegraphics[width=2.5cm,height=4cm,clip,keepaspectratio]{a3}}]
-\textbf{Patricia Melin} %% Affiliation and educational background.
-\href{https://orcid.org/0000-0001-5798-1426}{\includegraphics[width=0.02\textwidth]{orcid.png}} 
-\href{https://scholar.google.com/citations?user=Ts6JtfMAAAAJ&hl=en}{\includegraphics[width=0.02\textwidth]{gscholar.png}}
-\href{https://www.scopus.com/authid/detail.uri?authorId=7006491873}{\includegraphics[width=0.02\textwidth]{scopus.png}}
-\href{https://publons.com/researcher/1332081/patricia-melin/}{\includegraphics[width=0.02\textwidth]{publons.png}} received the D.Sc. degree (Doctor Habilitatus D.Sc.) in computer science from the Polish Academy of Sciences, Warsaw, Poland, with the Dissertation “Hybrid Intelligent Systems for Pattern Recognition using Soft Computing”. She is a Professor of Computer Science in the Graduate Division, Tijuana Institute of Technology, Tijuana, Mexico since 1998. In addition, she is serving as Director of Graduate Studies in computer science and Head of the research group on Computational Intelligence (2000–present). Her research interests are in Type-2 Fuzzy Logic, Modular Neural Networks, Pattern Recognition, Neuro-Fuzzy and Genetic-Fuzzy hybrid approaches., She is currently the President of Hispanic American Fuzzy Systems Association (HAFSA) and is the founding Chair of the Mexican Chapter of the IEEE Computational Intelligence Society. She can be contacted at email: pmelin@tectijuana.mx.
-\end{biography}
 
 
 \end{document}
